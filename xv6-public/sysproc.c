@@ -6,10 +6,6 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
-#include "fs.h"
-#include "spinlock.h"
-#include "sleeplock.h"
-#include "buf.h"
 
 int
 sys_fork(void)
@@ -112,27 +108,6 @@ int sys_myMemory(void) {
     }
   }
   cprintf("Current page usage: %d alloced, %d accessible, %d writable\n", alloced, accessible, writable);
-  return 0;
-}
-
-int sys_getINode(void) {
-  int device, iNum;
-  struct dinode *inode;
-  struct superblock sb;
-  cprintf("Start\n");
-  if(argint(0, &device) < 0)
-    return -1;
-  if(argint(1, &iNum) < 0)
-    return -1;
-  if(argptr(2, (char **)&inode, sizeof(struct dinode)) < 0)
-    return -1;
-  cprintf("Middle\n");
-  readsb(device, &sb);
-
-  struct buf *bp = bread(device, IBLOCK(iNum, sb));
-  // *inode = *((struct dinode*)bp->data + iNum%IPB);
-  memmove(inode, (struct dinode*)bp->data + iNum%IPB, sizeof(struct dinode));
-  cprintf("End\n");
   return 0;
 }
 
