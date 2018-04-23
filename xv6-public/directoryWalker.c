@@ -23,7 +23,7 @@ fmtname(char *path)
 }
 
 void
-ls(char *path, char *indentation)
+dw(char *path, char *indentation)
 {
   char buf[512], *p;
   char indentBuf[50];
@@ -32,12 +32,12 @@ ls(char *path, char *indentation)
   struct stat st;
 
   if((fd = open(path, 0)) < 0){
-    printf(2, "ls: cannot open %s\n", path);
+    printf(2, "dw: cannot open %s\n", path);
     return;
   }
 
   if(fstat(fd, &st) < 0){
-    printf(2, "ls: cannot stat %s\n", path);
+    printf(2, "dw: cannot stat %s\n", path);
     close(fd);
     return;
   }
@@ -49,7 +49,7 @@ ls(char *path, char *indentation)
 
   case T_DIR:
     if(strlen(path) + 1 + DIRSIZ + 1 > sizeof buf){
-      printf(1, "ls: path too long\n");
+      printf(1, "dw: path too long\n");
       break;
     }
     strcpy(buf, path);
@@ -61,7 +61,7 @@ ls(char *path, char *indentation)
       memmove(p, de.name, DIRSIZ);
       p[DIRSIZ] = 0;
       if(stat(buf, &st) < 0){
-        printf(1, "ls: cannot stat %s\n", buf);
+        printf(1, "dw: cannot stat %s\n", buf);
         continue;
       }
       printf(1, "%s%s %d %d %d\n", indentation, fmtname(buf), st.type, st.ino, st.size);
@@ -70,7 +70,7 @@ ls(char *path, char *indentation)
       *i++ = ' ';
       *i++ = '\0';
       if(st.type == 1 && strcmp(fmtname(buf), ".             ") != 0 && strcmp(fmtname(buf), "..            ") != 0) {
-        ls(buf, indentBuf);
+        dw(buf, indentBuf);
       }
     }
     break;
@@ -84,10 +84,10 @@ main(int argc, char *argv[])
   int i;
 
   if(argc < 2){
-    ls(".", "");
+    dw(".", "");
     exit();
   }
   for(i=1; i<argc; i++)
-    ls(argv[i], "");
+    dw(argv[i], "");
   exit();
 }

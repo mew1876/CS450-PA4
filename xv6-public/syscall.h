@@ -23,3 +23,4 @@
 #define SYS_getCallCount 22
 #define SYS_myMemory 23
 #define SYS_getINode 24
+#define SYS_getSuperBlock 25

@@ -106,6 +106,7 @@ extern int sys_uptime(void);
 extern int sys_getCallCount(void);
 extern int sys_myMemory(void);
 extern int sys_getINode(void);
+extern int sys_getSuperBlock(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -131,7 +132,8 @@ static int (*syscalls[])(void) = {
 [SYS_close]   sys_close,
 [SYS_getCallCount]  sys_getCallCount,
 [SYS_myMemory]  sys_myMemory,
-[SYS_getINode] sys_getINode
+[SYS_getINode] sys_getINode,
+[SYS_getSuperBlock] sys_getSuperBlock
 };
 
 void

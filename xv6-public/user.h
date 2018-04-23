@@ -1,6 +1,7 @@
 struct stat;
 struct rtcdate;
 struct dinode;
+struct superblock;
 
 // system calls
 int fork(void);
@@ -27,6 +28,7 @@ int uptime(void);
 int getCallCount(int);
 int myMemory(void);
 int getINode(int, int, struct dinode*);
+int getSuperBlock(int, struct superblock*);
 
 // ulib.c
 int stat(char*, struct stat*);

@@ -17,6 +17,17 @@
 #include "file.h"
 #include "fcntl.h"
 
+int sys_getSuperBlock(void) {
+  int device;
+  struct superblock *sb;
+  if(argint(0, &device) < 0)
+    return -1;
+  if(argptr(1, (char **)&sb, sizeof(struct superblock)) < 0)
+    return -1;
+  readsb(device, sb);
+  return 0;
+}
+
 int sys_getINode(void) {
   int device, iNum;
   struct dinode *inode;
@@ -30,8 +41,8 @@ int sys_getINode(void) {
   readsb(device, &sb);
 
   struct buf *bp = bread(device, IBLOCK(iNum, sb));
-  // *inode = *((struct dinode*)bp->data + iNum%IPB);
-  memmove(inode, (struct dinode*)bp->data + iNum%IPB, sizeof(struct dinode));
+  *inode = *((struct dinode*)bp->data + iNum%IPB);
+  brelse(bp);
   return 0;
 }
 
