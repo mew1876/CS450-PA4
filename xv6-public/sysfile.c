@@ -32,6 +32,7 @@ int sys_getINode(void) {
   struct buf *bp = bread(device, IBLOCK(iNum, sb));
   // *inode = *((struct dinode*)bp->data + iNum%IPB);
   memmove(inode, (struct dinode*)bp->data + iNum%IPB, sizeof(struct dinode));
+  brelse(bp);
   return 0;
 }
 

@@ -6,35 +6,58 @@
 #include "sleeplock.h"
 #include "buf.h"
 
+#include "param.h"
+
+void printDInodeInfo(struct dinode dip){
+  // print nlink, size, and addrs
+  printf(1,"   fs links=%d\n",dip.nlink);
+  printf(1,"   size=%d\n",dip.size);
+  printf(1,"   data block addresses=");
+  int i;
+  for (i=0;i < (sizeof(dip.addrs)/sizeof(dip.addrs[0])); i++) {
+      printf(1,"%d,",dip.addrs[i]);
+  }
+  printf(1,"\n");
+}
+
+void printDInode(int device, int iNum){
+  struct dinode dip = {0};
+  getINode(device, iNum, &dip);
+
+  // print type information
+  printf(1,"inode#=%d\n",iNum);
+  printf(1,"   type=");
+  switch(dip.type){
+    case 0:
+      printf(1,"free\n");
+      break;
+    case T_DIR:
+      printf(1,"directory\n");
+      printDInodeInfo(dip);
+      break;
+    case T_FILE:
+      printf(1,"file\n");
+      printDInodeInfo(dip);
+      break;
+    case T_DEV: // not required for resolving directory crash issues
+      // printf(1,"device\n");
+      // printf(1,"   major:%d",dip.major);
+      // printf(1,"   minor:%d",dip.minor);
+      break;
+    default:  
+      printf(1,"other/error type");
+  }
+  // printf(1, "%d", dip.type);
+  printf(1,"\n");
+}
+
 int main(int argc, char *argv[]) {
-  // int inum;
-  // struct buf *bp;
-  // struct dinode *dip;
-  // struct superblock sb = {0};
-
-  // bp = bread(1, 1);
-  // printf(1,"%p",bp->data);
-  // memmove(&sb, bp->data, sizeof(sb));
-  // printf(1,"Started");
-  // brelse(bp);
-
-  // // int table[sb.ninodes];
-  // for(inum = 1; inum < sb.ninodes; inum++) {
-  //   bp = bread(1, IBLOCK(inum, sb));
-  //   dip = (struct dinode*)bp->data + inum%IPB;
-  //   if(dip->type == 0) {
-  //     printf(1,"inode %d is free\n", inum);
-  //     // table[inum] = 0;
-  //   }
-  //   else {
-  //     printf(1,"inode %d is alloced\n", inum);
-  //     // table[inum] = 1;
-  //   }
-  //   brelse(bp);
-  // }
-	struct dinode dip = {0};
-	getINode(1, 3, &dip);
-	printf(1, "%d", dip.type);
+  int i;
+  for(i=0; i<NINODE; i++){ // NINODE is in param.h
+    // printf(1,"%d",i);
+    // printf(1,"%d",NINODE);
+    printDInode(ROOTDEV,i);
+  }
   exit();
 }
 
