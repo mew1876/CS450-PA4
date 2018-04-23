@@ -22,30 +22,30 @@ void walkTree(int* table, char *path) {
 		printf(1,"failed to open %s\n", path);
 		return;
 	}
-  if(fstat(fd, &st) < 0){
-    close(fd);
-    printf(1,"failed to stat %s\n", path);
-    return;
-  }
+	if(fstat(fd, &st) < 0){
+		close(fd);
+		printf(1,"failed to stat %s\n", path);
+		return;
+	}
 
-  table[st.ino] = 1;
-  if(st.type == T_DIR) {
-  	char buf[256];
+	table[st.ino] = 1;
+	if(st.type == T_DIR) {
+		char buf[256];
 		int pathLength = strlen(path);
 		memmove(buf, path, pathLength);
 		buf[pathLength] = '/';
 
-  	while(read(fd, &de, sizeof(de)) == sizeof(de)) {
-  		if(de.inum == 0)
-  			continue;
-  		if(strcmp(de.name, ".") == 0 || strcmp(de.name, "..") == 0)
-  			continue;
-  		memmove(buf + pathLength + 1, de.name, strlen(de.name));
-  		walkTree(table, buf);
-  		memset(buf + pathLength + 1, '\0', 256 - pathLength - 1);
-  	}
-  }
-  close(fd);
+		while(read(fd, &de, sizeof(de)) == sizeof(de)) {
+			if(de.inum == 0)
+				continue;
+			if(strcmp(de.name, ".") == 0 || strcmp(de.name, "..") == 0)
+				continue;
+			memmove(buf + pathLength + 1, de.name, strlen(de.name));
+			walkTree(table, buf);
+			memset(buf + pathLength + 1, '\0', 256 - pathLength - 1);
+		}
+	}
+	close(fd);
 }
 
 void getReachableINodes(int *table, int ninodes) {
