@@ -178,6 +178,7 @@ UPROGS=\
 	_HW3Test\
 	_directoryWalker\
 	_inodeTBWalker\
+	_fsChecker\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)

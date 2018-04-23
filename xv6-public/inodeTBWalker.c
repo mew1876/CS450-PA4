@@ -55,7 +55,7 @@ void printDInode(int device, int iNum){
 
 int main(int argc, char *argv[]) {
   int i;
-  struct superblock sb;
+  struct superblock sb = {0};
   getSuperBlock(1, &sb);
   for(i = 0; i < sb.ninodes; i++){
     // printf(1,"%d",i);
