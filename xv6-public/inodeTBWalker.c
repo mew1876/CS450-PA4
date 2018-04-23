@@ -32,9 +32,9 @@ int main(int argc, char *argv[]) {
   //   }
   //   brelse(bp);
   // }
-	struct dinode *dip = {0};
-	getINode(1, 3, dip);
-	printf(1, "Exit\n");
+	struct dinode dip = {0};
+	getINode(1, 3, &dip);
+	printf(1, "%d", dip.type);
   exit();
 }
 

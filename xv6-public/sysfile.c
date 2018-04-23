@@ -21,20 +21,17 @@ int sys_getINode(void) {
   int device, iNum;
   struct dinode *inode;
   struct superblock sb;
-  cprintf("Start\n");
   if(argint(0, &device) < 0)
     return -1;
   if(argint(1, &iNum) < 0)
     return -1;
   if(argptr(2, (char **)&inode, sizeof(struct dinode)) < 0)
     return -1;
-  cprintf("Middle\n");
   readsb(device, &sb);
 
   struct buf *bp = bread(device, IBLOCK(iNum, sb));
   // *inode = *((struct dinode*)bp->data + iNum%IPB);
   memmove(inode, (struct dinode*)bp->data + iNum%IPB, sizeof(struct dinode));
-  cprintf("End\n");
   return 0;
 }
 
