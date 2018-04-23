@@ -56,9 +56,11 @@ int main(int argc, char *argv[]) {
 	struct superblock sb = {0};
 	getSuperBlock(1, &sb);
 
-	int *allocedINodes = (int *)malloc(sizeof(int) * sb.ninodes);
+	int allocedINodes[sb.ninodes];
+	memset(allocedINodes, 0, sizeof(allocedINodes));
 	getAllocedINodes(allocedINodes, sb.ninodes);
-	int *reachableINodes = (int *)malloc(sizeof(int) * sb.ninodes);
+	int reachableINodes[sb.ninodes];
+	memset(reachableINodes, 0, sizeof(reachableINodes));
 	getReachableINodes(reachableINodes, sb.ninodes);
 
 	for(int i = 1; i < sb.ninodes; i++) {
