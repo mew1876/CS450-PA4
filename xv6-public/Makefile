@@ -180,6 +180,7 @@ UPROGS=\
 	_inodeTBWalker\
 	_fsChecker\
 	_directoryEraser\
+	_fsFixer\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)

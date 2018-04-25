@@ -2,6 +2,7 @@ struct stat;
 struct rtcdate;
 struct dinode;
 struct superblock;
+struct buf;
 
 // system calls
 int fork(void);
@@ -30,6 +31,8 @@ int myMemory(void);
 int getINode(int, int, struct dinode*);
 int getSuperBlock(int, struct superblock*);
 int dirErase(int dev, int inum);
+int bread(int, int, struct buf*);
+int brelse(struct buf*);
 
 // ulib.c
 int stat(char*, struct stat*);

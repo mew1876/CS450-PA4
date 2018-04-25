@@ -68,6 +68,28 @@ int sys_getINode(void) {
 	return 0;
 }
 
+int sys_bread(void) {
+  int device, blockNum;
+  struct buf *bp;
+  if(argint(0, &device) < 0)
+    return -1;
+  if(argint(1, &blockNum) < 0)
+    return -1;
+  if(argptr(2, (char **)&bp, sizeof(struct buf)))
+    return -1;
+
+  *bp = *bread(device, blockNum);
+  return 0;
+}
+
+int sys_brelse(void) {
+  struct buf *bp;
+  if(argptr(0, (char **)&bp, sizeof(struct buf)))
+    return -1;
+  brelse(bp);
+  return 0;
+}
+
 // Fetch the nth word-sized system call argument as a file descriptor
 // and return both the descriptor and the corresponding struct file.
 static int
