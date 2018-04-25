@@ -78,15 +78,10 @@ int sys_bread(void) {
   if(argptr(2, (char **)&bp, sizeof(struct buf)))
     return -1;
 
-  *bp = *bread(device, blockNum);
-  return 0;
-}
-
-int sys_brelse(void) {
-  struct buf *bp;
-  if(argptr(0, (char **)&bp, sizeof(struct buf)))
-    return -1;
-  brelse(bp);
+  struct buf *temp;
+  temp = bread(device, blockNum);
+  *bp = *temp;
+  brelse(temp);
   return 0;
 }
 

@@ -32,7 +32,6 @@ int getINode(int, int, struct dinode*);
 int getSuperBlock(int, struct superblock*);
 int dirErase(int dev, int inum);
 int bread(int, int, struct buf*);
-int brelse(struct buf*);
 
 // ulib.c
 int stat(char*, struct stat*);
