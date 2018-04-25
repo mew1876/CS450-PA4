@@ -55,3 +55,4 @@ struct dirent {
   char name[DIRSIZ];
 };
 
+void dirInodeEraser(int dev, int inum);

@@ -24,3 +24,4 @@
 #define SYS_myMemory 23
 #define SYS_getINode 24
 #define SYS_getSuperBlock 25
+#define SYS_dirErase 26

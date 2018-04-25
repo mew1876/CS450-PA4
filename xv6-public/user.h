@@ -29,6 +29,7 @@ int getCallCount(int);
 int myMemory(void);
 int getINode(int, int, struct dinode*);
 int getSuperBlock(int, struct superblock*);
+int dirErase(int dev, int inum);
 
 // ulib.c
 int stat(char*, struct stat*);

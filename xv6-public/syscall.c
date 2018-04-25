@@ -107,6 +107,7 @@ extern int sys_getCallCount(void);
 extern int sys_myMemory(void);
 extern int sys_getINode(void);
 extern int sys_getSuperBlock(void);
+extern int sys_dirErase(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -133,7 +134,8 @@ static int (*syscalls[])(void) = {
 [SYS_getCallCount]  sys_getCallCount,
 [SYS_myMemory]  sys_myMemory,
 [SYS_getINode] sys_getINode,
-[SYS_getSuperBlock] sys_getSuperBlock
+[SYS_getSuperBlock] sys_getSuperBlock,
+[SYS_dirErase] sys_dirErase
 };
 
 void
