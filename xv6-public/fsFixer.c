@@ -101,6 +101,8 @@ void recoverLostBlock(int device, int blockNo, struct superblock sb){
 	dip->nlink = lostInode.nlink;
 	dip->size = lostInode.size;
 	memmove(dip->addrs, lostInode.addrs, sizeof(lostInode.addrs));
+	printf(1,"Recovered inode: inum: %d, type: %d, nlink: %d, size: %d\n", lostINum, dip->type, dip->nlink, dip->size);
+	printf(1,"Block num: %d\n", newbuf.blockno);
 	bwrite(&newbuf);
 }
 
