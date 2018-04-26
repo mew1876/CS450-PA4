@@ -98,13 +98,16 @@ void recoverLostBlock(int device, int blockNo){
 
 void getOrphanBlocks(int *table, int *reachable, struct superblock *sb) {
 	struct buf blockbuf = {0};
-	for(int b = 0; b < sb->size; b += blockbufB) {
-		bread(ROOTDEV, (b/blockbufB + sb->bmapstart), &blockbuf);
-		for(int bi = 0; bi < blockbufB && b + bi < sb->size; bi++) {
+	for(int b = 0; b < sb->size; b += BPB) {
+		bread(ROOTDEV, (b/BPB + sb->bmapstart), &blockbuf);
+		for(int bi = 0; bi < BPB && b + bi < sb->size; bi++) {
 			int m = 1 << (bi % 8);
-			printf(1,"Block: %d Bitmap: %d Reachable: %d\n", b + bi, (blockbuf.data[bi/8] & m) != 0, reachable[b + bi]);
-			if((blockbuf−>data[bi/8] & m) != 0) {
-				
+			// printf(1,"Block: %d Bitmap: %d Reachable: %d\n", b + bi, (blockbuf.data[bi/8] & m) != 0, reachable[b + bi]);
+			if((blockbuf.data[bi/8] & m) != 0) {
+				if(!reachable[b + bi] && b + bi > 58) {
+					table[b + bi] = 1;
+					printf(1,"Error with block %d\n", b + bi);
+				}
 			}
 		}
 	}
