@@ -52,7 +52,7 @@ void getINodeReachableBlocks(int *table, struct superblock *sb) {
 	}
 }
 
-void recoverLostBlock(int device, int blockNo){
+void recoverLostBlock(int device, int blockNo, struct superblock sb){
 	printf(1,"recoverLostBlock\n");
 	struct dinode lostInode = {0};
 	lostInode.type = T_DIR;
@@ -92,22 +92,34 @@ void recoverLostBlock(int device, int blockNo){
 	}
 	lostInode.size = size;
 	lostInode.nlink = nlink;
-	// write lostInode to dist
-	printf(1,"%d", lostInode.nlink);
+	lostInode.major = 0;
+	lostInode.minor = 0;
+	
+	// write lostInode to disk
+	bread(ROOTDEV,IBLOCK(lostINum,sb),&blockbuf);
+	struct dinode *dip = (struct dinode *)blockbuf.data + lostINum%IPB;
+	dip->type = lostInode.type;
+	dip->major = lostInode.major;
+	dip->minor = lostInode.minor;
+	dip->nlink = lostInode.nlink;
+	dip->size = lostInode.size;
+	memmove(dip->addrs, lostInode.addrs, sizeof(lostInode.addrs));
+	// log_write(blockbuf)
+	// brelse(bp);
 }
 
-void getOrphanBlocks(int *table, int *reachable, struct superblock *sb) {
-	struct buf blockbuf = {0};
-	for(int b = 0; b < sb->size; b += blockbufB) {
-		bread(ROOTDEV, (b/blockbufB + sb->bmapstart), &blockbuf);
-		for(int bi = 0; bi < blockbufB && b + bi < sb->size; bi++) {
-			int m = 1 << (bi % 8);
-			printf(1,"Block: %d Bitmap: %d Reachable: %d\n", b + bi, (blockbuf.data[bi/8] & m) != 0, reachable[b + bi]);
-			if((blockbuf−>data[bi/8] & m) != 0) {
+void getOrphanBlocks(int *table, int *reachable, struct superblock sb) {
+	// struct buf blockbuf = {0};
+	// for(int b = 0; b < sb->size; b += BPB) {
+	// 	bread(ROOTDEV, (b/BPB + sb->bmapstart), &blockbuf);
+	// 	for(int bi = 0; bi < BPB && b + bi < sb->size; bi++) {
+	// 		int m = 1 << (bi % 8);
+	// 		printf(1,"Block: %d Bitmap: %d Reachable: %d\n", b + bi, (blockbuf.data[bi/8] & m) != 0, reachable[b + bi]);
+	// 		if((blockbuf->data[bi/8] & m) != 0) {
 				
-			}
-		}
-	}
+	// 		}
+	// 	}
+	// }
 }
 
 int main(int argc, char *argv[]) {
@@ -127,7 +139,7 @@ int main(int argc, char *argv[]) {
 	// }
 
 
-	recoverLostBlock(ROOTDEV,795); // inode 27 = 2nd made directory
+	recoverLostBlock(ROOTDEV,795,sb); // inode 27 = 2nd made directory
 	exit();
 }
 

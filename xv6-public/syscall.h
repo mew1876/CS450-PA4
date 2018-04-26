@@ -26,3 +26,4 @@
 #define SYS_getSuperBlock 25
 #define SYS_dirErase 26
 #define SYS_bread 27
+#define SYS_bwrite 28
