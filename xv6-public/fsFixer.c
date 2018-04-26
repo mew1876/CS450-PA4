@@ -53,7 +53,6 @@ void getINodeReachableBlocks(int *table, struct superblock *sb) {
 }
 
 void recoverLostBlock(int device, int blockNo, struct superblock sb){
-	printf(1,"recoverLostBlock\n");
 	struct dinode lostInode = {0};
 	lostInode.type = T_DIR;
 	struct dirent *lostDEDot = 0;
@@ -64,16 +63,13 @@ void recoverLostBlock(int device, int blockNo, struct superblock sb){
 	bread(ROOTDEV,blockNo,&blockbuf);
 	lostDEDot = (struct dirent *)(&(blockbuf.data));
 	lostDEDotDot =(struct dirent*)(&(blockbuf.data))+1;
-	printf(1,"data  ptr=%p\n",&(blockbuf.data));
-	printf(1,"data2 ptr=%p\n",&(blockbuf.data)+sizeof(struct dirent));
-	printf(1,"pointerchecks");
 	if(lostDEDot<0){
 		printf(1,"\".\" dirent * error");
 	}
 	if(lostDEDotDot<0){
 		printf(1,"\"..\" dirent * error");
 	}
-	int parentINum = lostDEDotDot->inum;
+	// int parentINum = lostDEDotDot->inum;
 	int lostINum = lostDEDot->inum;
 	if(strcmp(".",lostDEDot->name)==0) {
 		printf(1,"dirent wasn't \".\"");
@@ -82,7 +78,7 @@ void recoverLostBlock(int device, int blockNo, struct superblock sb){
 
 	uint size = 0;
 	short nlink = -2; // to discount . and ..
-	printf(1,"%p%d%d",&lostInode,parentINum,lostINum);
+	// printf(1,"%p%d%d",&lostInode,parentINum,lostINum);
 	for(int i = 0; i < BSIZE/sizeof(struct dirent); i++){ // loop over dirent entries
 		// add to size
 		size += sizeof(struct dirent);
@@ -137,12 +133,15 @@ int main(int argc, char *argv[]) {
 	memset(orphanBlocks, 0, sizeof(reachableBlocks));
 	getOrphanBlocks(orphanBlocks, reachableBlocks, &sb);
 
-	// for(int i = 1; i < sb.size; i++) {
-	// 	printf(1,"Block: %d Reachable: %d\n", i, reachableBlocks[i]);
-	// }
+	for(int i = 1; i < sb.size; i++) {
+		if(orphanBlocks[i]) {
+			printf(1,"Error with block %d", i);
+			recoverLostBlock(ROOTDEV, i, sb);
+		}
+	}
 
-
-	recoverLostBlock(ROOTDEV,795,sb); // inode 27 = 2nd made directory
+	free(reachableBlocks);
+	free(orphanBlocks);
 	exit();
 }
 
