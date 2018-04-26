@@ -17,6 +17,16 @@
 #include "file.h"
 #include "fcntl.h"
 
+int sys_bwrite(void){
+	struct buf *b;
+	if(argptr(1, (char **)&b, sizeof(struct buf)) < 0)
+		return -1;
+	begin_op();
+	log_write(b);
+	end_op();
+	return 0;
+}
+
 int sys_dirErase(void){
 	int dev, iNum;
 	struct buf *bp;

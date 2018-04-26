@@ -109,6 +109,7 @@ extern int sys_getINode(void);
 extern int sys_getSuperBlock(void);
 extern int sys_dirErase(void);
 extern int sys_bread(void);
+extern int sys_bwrite(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -138,6 +139,7 @@ static int (*syscalls[])(void) = {
 [SYS_getSuperBlock] sys_getSuperBlock,
 [SYS_dirErase] sys_dirErase,
 [SYS_bread] sys_bread,
+[SYS_bwrite] sys_bwrite,
 };
 
 void
