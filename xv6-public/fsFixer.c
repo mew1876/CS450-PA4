@@ -9,7 +9,7 @@
 
 void getINodeReachableBlocks(int *table, struct superblock *sb) {
 	struct dinode inode = {0};
-	struct buf bp = {0};
+	struct buf blockbuf = {0};
 	for(int i = 1; i < sb->ninodes; i++) {
 		getINode(ROOTDEV, i, &inode);
 		if(inode.type) {
@@ -25,13 +25,13 @@ void getINodeReachableBlocks(int *table, struct superblock *sb) {
 			//check indirect links
 			uint addr;
 			if(inode.addrs[NDIRECT]) {
-				// printf(1,"BREADING %p\n", &bp);
+				// printf(1,"BREADING %p\n", &blockbuf);
 				// printf(1,"block %d\n", inode.addrs[NDIRECT]);
-				bread(1, inode.addrs[NDIRECT], &bp);
-				// printf(1,"AFTER BREAD\nReceived pointer: %p\n", bp);
-				if(bp.data) {
+				bread(ROOTDEV, inode.addrs[NDIRECT], &blockbuf);
+				// printf(1,"AFTER BREAD\nReceived pointer: %p\n", blockbuf);
+				if(blockbuf.data) {
 					for(int j = 0; j < NINDIRECT; j++) {
-						addr = (uint)bp.data[j];
+						addr = (uint)blockbuf.data[j];
 						// printf(1, "J: %d ADDR: %p", j , addr);
 						if(addr == 0) {
 							break;
@@ -46,6 +46,50 @@ void getINodeReachableBlocks(int *table, struct superblock *sb) {
 	}
 }
 
+void recoverLostBlock(int device, int blockNo){
+	printf(1,"recoverLostBlock\n");
+	struct dinode lostInode = {0};
+	lostInode.type = T_DIR;
+	struct dirent *lostDEDot = 0;
+	struct dirent *lostDEDotDot = 0;
+	struct buf blockbuf = {0};
+	
+	// recover first block of lost inode
+	bread(ROOTDEV,blockNo,&blockbuf);
+	lostDEDot = (struct dirent *)(&(blockbuf.data));
+	lostDEDotDot =(struct dirent*)(&(blockbuf.data))+1;
+	printf(1,"data  ptr=%p\n",&(blockbuf.data));
+	printf(1,"data2 ptr=%p\n",&(blockbuf.data)+sizeof(struct dirent));
+	printf(1,"pointerchecks");
+	if(lostDEDot<0){
+		printf(1,"\".\" dirent * error");
+	}
+	if(lostDEDotDot<0){
+		printf(1,"\"..\" dirent * error");
+	}
+	int parentINum = lostDEDotDot->inum;
+	int lostINum = lostDEDot->inum;
+	if(strcmp(".",lostDEDot->name)==0) {
+		printf(1,"dirent wasn't \".\"");
+	}
+	lostInode.addrs[0] = blockNo;
+
+	uint size = 0;
+	short nlink = -2; // to discount . and ..
+	printf(1,"%p%d%d",&lostInode,parentINum,lostINum);
+	for(int i = 0; i < BSIZE/sizeof(struct dirent); i++){ // loop over dirent entries
+		// add to size
+		size += sizeof(struct dirent);
+		// TODO: check that the inode in dirents actually refer to the current block
+			// THEN add to nlink
+		nlink++;
+	}
+	lostInode.size = size;
+	lostInode.nlink = nlink;
+	// write lostInode to dist
+	printf(1,"%d", lostInode.nlink);
+}
+
 int main(int argc, char *argv[]) {
 	struct superblock sb = {0};
 	getSuperBlock(1, &sb);
@@ -58,5 +102,8 @@ int main(int argc, char *argv[]) {
 		printf(1,"Block: %d Reachable: %d\n", i, reachableBlocks[i]);
 	}
 
+	recoverLostBlock(ROOTDEV,795); // inode 27 = 2nd made directory
 	exit();
 }
+
+// mkdir foo; mkdir foo/bar; directoryEraser 27; fsFixer;
