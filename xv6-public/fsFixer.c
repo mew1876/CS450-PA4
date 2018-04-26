@@ -96,16 +96,16 @@ void recoverLostBlock(int device, int blockNo, struct superblock sb){
 	lostInode.minor = 0;
 	
 	// write lostInode to disk
-	bread(ROOTDEV,IBLOCK(lostINum,sb),&blockbuf);
-	struct dinode *dip = (struct dinode *)blockbuf.data + lostINum%IPB;
+	struct buf newbuf = {0};
+	bread(ROOTDEV,IBLOCK(lostINum,sb),&newbuf);
+	struct dinode *dip = (struct dinode *)newbuf.data + lostINum%IPB;
 	dip->type = lostInode.type;
 	dip->major = lostInode.major;
 	dip->minor = lostInode.minor;
 	dip->nlink = lostInode.nlink;
 	dip->size = lostInode.size;
 	memmove(dip->addrs, lostInode.addrs, sizeof(lostInode.addrs));
-	// log_write(blockbuf)
-	// brelse(bp);
+	bwrite(&newbuf);
 }
 
 void getOrphanBlocks(int *table, int *reachable, struct superblock *sb) {
