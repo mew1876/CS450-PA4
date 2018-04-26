@@ -35,6 +35,7 @@ int sys_dirErase(void){
     panic("attempted to erase inode not a directory");
   }
   memset(dip, 0, sizeof(*dip));
+  bwrite(bp);
   brelse(bp);
   return 0;
 }

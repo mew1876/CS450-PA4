@@ -71,7 +71,7 @@ void recoverLostBlock(int device, int blockNo, struct superblock sb){
 	}
 	// int parentINum = lostDEDotDot->inum;
 	int lostINum = lostDEDot->inum;
-	if(strcmp(".",lostDEDot->name)==0) {
+	if(strcmp(".",lostDEDot->name)) {
 		printf(1,"dirent wasn't \".\"");
 	}
 	lostInode.addrs[0] = blockNo;
@@ -114,7 +114,7 @@ void getOrphanBlocks(int *table, int *reachable, struct superblock *sb) {
 			if((blockbuf.data[bi/8] & m) != 0) {
 				if(!reachable[b + bi] && b + bi > 58) {
 					table[b + bi] = 1;
-					printf(1,"Error with block %d\n", b + bi);
+					// printf(1,"Error with block %d\n", b + bi);
 				}
 			}
 		}
@@ -134,8 +134,9 @@ int main(int argc, char *argv[]) {
 	getOrphanBlocks(orphanBlocks, reachableBlocks, &sb);
 
 	for(int i = 1; i < sb.size; i++) {
+		// printf(1,"i: %d, o: %d\n", i, orphanBlocks[i]);
 		if(orphanBlocks[i]) {
-			printf(1,"Error with block %d", i);
+			printf(1,"Error with block %d\n", i);
 			recoverLostBlock(ROOTDEV, i, sb);
 		}
 	}
